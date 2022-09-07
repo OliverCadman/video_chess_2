@@ -15,6 +15,8 @@
     font-size: 0.5rem;
     width: calc(300px / 8);
     height: calc(300px / 8);
+    display: grid;
+    place-items: center;
 }
 
 .tile-content {
@@ -40,6 +42,11 @@
     color: #fefefe;
 }
 
+.piece {
+    width: 30px;
+}
+
+
 @media screen and (min-width: 768px) {
     #chessboard {
         width: 600px;
@@ -50,5 +57,9 @@
         width: calc(600px / 8);
         height: calc(600px / 8);
         font-size: 1rem;
+    }
+
+    .piece {
+    width: 70px;
     }
 }

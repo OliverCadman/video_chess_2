@@ -74,14 +74,16 @@ class ChessBoard {
             new ChessPiece(
               backrank[j],
               false,
-              this.playerIsWhite && whiteBackRankId[j]
+              this.playerIsWhite && whiteBackRankId[j],
+              this.playerIsWhite && "white"
             )
           );
           board[i + 1][this.playerIsWhite ? j : 7 - j].setPiece(
             new ChessPiece(
               "pawn",
               false,
-              this.playerIsWhite ? "wp" + (j + 1) : "bp" + i
+              this.playerIsWhite ? "wp" + (j + 1) : "bp" + i,
+              this.playerIsWhite && "white"
             )
           );
         } else {
@@ -90,14 +92,17 @@ class ChessBoard {
             new ChessPiece(
               "pawn",
               false,
-              this.playerIsWhite ? "bp" + (j + 1) : "wp" + (j + 1)
+              this.playerIsWhite ? "bp" + (j + 1) : "wp" + (j + 1),
+              this.playerIsWhite && "black"
+
             )
           );
           board[i][this.playerIsWhite ? j : 7 - j].setPiece(
             new ChessPiece(
               backrank[j],
               false,
-              this.playerIsWhite && blackBackRankId[j]
+              this.playerIsWhite && blackBackRankId[j],
+              this.playerIsWhite && "black"
             )
           );
         }

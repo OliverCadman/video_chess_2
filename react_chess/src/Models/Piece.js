@@ -1,8 +1,9 @@
 class ChessPiece {
-    constructor(name, isAttacked, id) {
+    constructor(name, isAttacked, id, color) {
         this.name = name;
         this.isAttacked = isAttacked;
         this.id = id;
+        this.color = color;
     }
 
     setSquare(newSquare) {
