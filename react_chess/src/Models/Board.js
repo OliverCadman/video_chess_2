@@ -1,15 +1,56 @@
 import Square from "./Square";
 import ChessPiece from "./Piece";
+import { Chess } from "chess.js"
 
 class ChessBoard {
   constructor(playerIsWhite) {
     this.playerIsWhite = playerIsWhite;
-    this.startingBoard = this.createBoard();
+    this.chessBoard = this.createBoard();
+
+    // Chess JS
+    this.chess = new Chess()
   }
 
-  getStartingBoard() {
-    return this.startingBoard;
+  getBoard() {
+    return this.chessBoard;
   }
+  
+  setBoard(newBoard) {
+    this.chessBoard = newBoard;
+  }
+
+  movePiece(pieceID, to) {
+    console.log(pieceID, to)
+    const currentBoard = this.getBoard();
+    const pieceCoordinates = this.findPiece(currentBoard, pieceID);
+
+    if (!pieceCoordinates) {
+      return;
+    }
+
+    const x = pieceCoordinates[0];
+    const y = pieceCoordinates[1];
+    
+    const currentSquare = currentBoard[y][x]
+
+    
+    const pieceToMove = currentBoard[y][x].getPiece();
+    currentBoard[to[1]][to[0]].setPiece(pieceToMove, "calling set board...");
+
+    this.setBoard(currentBoard);
+  }
+
+  findPiece(currentBoard, pieceID) {
+    for (let i = 0; i < 8; i++) {
+      for (let j = 0; j < 8; j++) {
+        if (currentBoard[i][j].getPieceIDOnSquare() === pieceID) {
+          return [j, i]
+        }
+      }
+    }
+  }
+
+
 
   createBoard() {
     const board = [];
@@ -21,7 +62,7 @@ class ChessBoard {
     for (let i = 0; i < horizontalAxisSquares.length; i++) {
       board.push([]);
       for (let j = 0; j < verticalAxisSquares.length; j++) {
-        const tileCount = j + i + 2;
+        // console.log(j, i)
         board[i].push(
           new Square(
             j,

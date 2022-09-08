@@ -13,12 +13,14 @@ class ChessPiece {
         }
 
         if (this.occupiedSquare === undefined) {
+
             this.occupiedSquare = newSquare;
             newSquare.setPiece(this);
         }
 
         const isOccupiedSquareDifferent = this.occupiedSquare.x !== newSquare.x || 
                                           this.occupiedSquare.y !== newSquare.y
+
 
         if (isOccupiedSquareDifferent) {
             this.occupiedSquare = newSquare;

@@ -15,10 +15,12 @@ class Square {
     this.pieceOnThisSquare = pieceOnThisSquare;
   }
 
-  setPiece(newPiece) {
+  setPiece(newPiece, message) {
     if (newPiece === null && this.pieceOnThisSquare === null) {
+      // console.log('everything is null')
       return;
     } else if (newPiece === null) {
+      // console.log('new piece is null')
       this.pieceOnThisSquare.setSquare(undefined);
       this.pieceOnThisSquare = null;
     } else if (this.pieceOnThisSquare === null) {
@@ -34,11 +36,16 @@ class Square {
   }
 
   getPieceIDOnSquare() {
+    // console.log(this)
     if (this.pieceOnThisSquare === null) {
       return "square is empty";
     } else {
       return this.pieceOnThisSquare.id;
     }
+  }
+
+  getPiece() {
+    return this.pieceOnThisSquare;
   }
 }
 
