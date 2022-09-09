@@ -59,6 +59,21 @@ class ChessBoard {
     }
 
     //
+    // Determine castling
+    //
+    
+    const playerDidCastle = this.didCastle(moveAttempt);
+    if (playerDidCastle) {
+
+      // If player castled, update position of rook.
+      const {fromX, toX, fromY, toY} = playerDidCastle;
+      let castlingRook = currentBoard[fromY][fromX].getPiece();
+      currentBoard[toY][toX].setPiece(castlingRook);
+      currentBoard[fromY][fromX].setPiece(null);
+    }
+
+
+    //
     // Determine circumstances when game is over.
     //
 
@@ -82,6 +97,61 @@ class ChessBoard {
         }
       }
     }
+  }
+
+  didCastle(moveAttempt) {
+
+    /**
+     * Check for castling attempt.
+     * If castle, return position and destination
+     * co-ordinates of rooks, relative to
+     * King-side or Queen side castling, and color.
+     */
+
+    const {from, to, piece} = moveAttempt;
+
+    if (piece === "k") {
+      if (from === "e1" && to === "c1") {
+        // White queenside castle
+        return {
+          didCastle: true,
+          fromX: 0,
+          toX: 3,
+          fromY: 0,
+          toY: 0,
+        };
+      } else if (from === "e1" && to === "g1") {
+        // White kingside castle
+        return {
+          didCastle: true,
+          fromX: 7,
+          toX: 5,
+          fromY: 0,
+          toY: 0,
+        };
+      } else if (from === "e8" && to === "c8") {
+        // Black queenside castle
+        return {
+          didCastle: true,
+          fromX: 0,
+          toX: 3,
+          fromY: 7,
+          toY: 7,
+        };
+      } else if (from === "e8" && to === "g8") {
+        // Black kingside castle
+        return {
+          didCastle: true,
+          fromX: 7,
+          toX: 5,
+          fromY: 7,
+          toY: 7,
+        };
+      } else {
+        return false;
+      }
+    } 
+    return false;
   }
 
 
