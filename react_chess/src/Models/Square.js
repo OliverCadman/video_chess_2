@@ -15,9 +15,12 @@ class Square {
     this.pieceOnThisSquare = pieceOnThisSquare;
   }
 
+  userTriedToCaptureTheirOwnPiece(piece1, piece2) {
+    return piece1.id === piece2.id;
+  }
+
   setPiece(newPiece, message) {
     if (newPiece === null && this.pieceOnThisSquare === null) {
-      // console.log('everything is null')
       return;
     } else if (newPiece === null) {
       // console.log('new piece is null')
@@ -32,6 +35,8 @@ class Square {
     ) {
       this.pieceOnThisSquare = newPiece;
       newPiece.setSquare(this);
+    } else if (this.newPiece && this.pieceOnThisSquare && this.userTriedToCaptureTheirOwnPiece(this.newPiece, this.pieceOnThisSquare)) {
+      return;
     }
   }
 

@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import "./Chessboard.css";
 import ChessBoard from "../../Models/Board";
 import Tile from "./Tile";
@@ -17,6 +17,10 @@ const Chessboard = () => {
   let clickedSquareCoords;
   let selectedPieceID;
   let squareClicked;
+  
+  useEffect(() => {
+    console.log('chessboard c')
+  }, [chessBoard])
 
 
   const startingBoard = chessBoard.getBoard()

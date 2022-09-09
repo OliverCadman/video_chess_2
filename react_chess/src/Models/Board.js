@@ -20,7 +20,6 @@ class ChessBoard {
   }
 
   movePiece(pieceID, to) {
-    console.log(pieceID, to)
     const currentBoard = this.getBoard();
     const pieceCoordinates = this.findPiece(currentBoard, pieceID);
 
@@ -30,14 +29,49 @@ class ChessBoard {
 
     const x = pieceCoordinates[0];
     const y = pieceCoordinates[1];
-    
-    const currentSquare = currentBoard[y][x]
 
-    
+    const fromSquareAlgebraNotation = currentBoard[y][x].notation;
+    const toSquareAlgebraNotation = currentBoard[to[1]][to[0]].notation;
+
     const pieceToMove = currentBoard[y][x].getPiece();
-    currentBoard[to[1]][to[0]].setPiece(pieceToMove, "calling set board...");
 
-    this.setBoard(currentBoard);
+    // Validate moves with chess.js
+    const moveAttempt = this.chess.move({
+      from: fromSquareAlgebraNotation,
+      to: toSquareAlgebraNotation,
+      piece: pieceID[1]
+    });
+    
+    if (moveAttempt) {
+        currentBoard[to[1]][to[0]].setPiece(
+          pieceToMove,
+          "calling set board..."
+        );
+
+        currentBoard[y][x].setPiece(null);
+
+        this.setBoard(currentBoard);
+    } else if (moveAttempt === null) {
+      console.log('invalid move');
+      return;
+    } else if (moveAttempt.flags === "c") {
+      console.log("capture")
+    }
+
+    //
+    // Determine circumstances when game is over.
+    //
+
+    // Checkmate
+    const checkMate = this.chess.isCheckmate() ? true : false;
+    if (checkMate) return this.chess.turn() + checkMate;
+
+
+    // Threefold repetition
+    const threeFoldRepetition = this.chess.isThreefoldRepetition() ?
+                                true : false;
+
+    if (threeFoldRepetition) return this.chess.turn() + threeFoldRepetition;
   }
 
   findPiece(currentBoard, pieceID) {
