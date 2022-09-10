@@ -1,6 +1,6 @@
 import Square from "./Square";
 import ChessPiece from "./Piece";
-import { Chess } from "chess.js"
+import { Chess } from "chess.js";
 
 class ChessBoard {
   constructor(playerIsWhite) {
@@ -20,9 +20,10 @@ class ChessBoard {
   }
 
   movePiece(pieceID, to) {
+    
     const currentBoard = this.getBoard();
     const pieceCoordinates = this.findPiece(currentBoard, pieceID);
-
+  
     if (!pieceCoordinates) {
       return;
     }
@@ -61,7 +62,7 @@ class ChessBoard {
     //
     // Determine castling
     //
-    
+
     const playerDidCastle = this.didCastle(moveAttempt);
     if (playerDidCastle) {
 

@@ -1,17 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Buhid&display=swap');
+
 #chessboard {
     height: 300px;
     width: 300px;
     display: flex;
     flex-wrap: wrap-reverse;
     position: relative;
-    z-index: 0;
+    z-index: 3;
     margin: 2rem;
 
 
-}
-
-.glide {
-    transition: 
 }
 
 .tile {
@@ -29,6 +27,12 @@
     position: absolute;
 }
 
+.tile-content.letter,
+.tile-content.number {
+   font-family: 'Noto Sans Buhid', sans-serif;
+   font-size: 0.85rem; 
+}
+
 .tile-content.letter {
     bottom: 0;
     left: 2px;
@@ -40,11 +44,11 @@
 }
 
 .tile.light {
-    background-color: #eeeed2;
+    background-color: #efd9b5;
 }
 
 .tile.dark {
-    background-color: #769655;
+    background-color: #b48863;
     color: #fefefe;
 }
 
@@ -53,6 +57,7 @@
     transition: all 0.3s ease;
     animation-name: bounce;
     animation-duration: 0.3s;
+    transform: translate(0, 0);
 }
 
 
@@ -86,3 +91,4 @@
         transform: scale(1)
     }
 }
+

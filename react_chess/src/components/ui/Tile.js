@@ -1,35 +1,48 @@
-import './Chessboard.css';
-import ChessPiece from './ChessPiece';
+import "./Chessboard.css";
+import ChessPiece from "./ChessPiece";
+import { useDrop } from "react-dnd";
+import { ItemTypes } from "../../DragDrop/constants";
 
-import React from 'react'
+import React from "react";
 
 const Tile = (props) => {
-    const xCoord = props.square.x;
-    const yCoord = props.square.y;
+  const xCoord = props.square.x;
+  const yCoord = props.square.y;
 
-    const squareClickedX = props.squareClickIndex && props.squareClickIndex[0];
-    const squareClickedY = props.squareClickIndex && props.squareClickIndex[1];
-
+  const [{ isOver, data, canDrop, }, drop] = useDrop(
+    () => ({
+      accept: ItemTypes.PIECE,
+      drop: (data) => {
+        props.handlePieceMove(data.square.pieceOnThisSquare.id, [xCoord, yCoord]);
+      },
+      collect: (monitor) => {
+        return {
+          canDrop: !!monitor.canDrop(),
+          data: monitor.getItem(),
+          isOver: !!monitor.isOver(),
+        };
+      },
+    })
+  );
   return (
     <div
       className={props.tileCount % 2 === 0 ? "tile light" : "tile dark"}
-      onClick={() =>
-        props.handlePieceMove(
-          props.pieceID,
-          props.square,
-          [xCoord, yCoord],
-          props.index
-        )
-      }
-      style={{
-        backgroundColor:
-          props.squareClicked &&
-          xCoord === squareClickedX &&
-          yCoord === squareClickedY
-            ? "rgba(232, 175, 154, 0.8)"
-            : "",
-      }}
+      ref={drop}
     >
+      {isOver && (
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            height: "100%",
+            width: "100%",
+            zIndex: 1,
+            opacity: 0.5,
+            backgroundColor: "red",
+          }}
+        ></div>
+      )}
       {/* Render letters on first rank only, and numbers on 'h' rank going up board. */}
       <span className="tile-content letter">
         {props.outerCount < 1 && props.tileLetter}
@@ -41,11 +54,12 @@ const Tile = (props) => {
         imageUrl={props.imageUrl}
         isPieceOnThisSquare={props.isPieceOnThisSquare}
         playerColor={props.playerColor}
-        handleClick={props.handleClick}
         pieceID={props.pieceID}
+        square={props.square}
+        chessBoard={props.chessBoard}
       />
     </div>
   );
-}
+};
 
-export default Tile
+export default Tile;
