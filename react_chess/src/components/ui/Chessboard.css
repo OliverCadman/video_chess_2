@@ -1,8 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Buhid&display=swap');
 
 #chessboard {
-    height: 300px;
-    width: 300px;
+    height: 325px;
+    width: 325px;
     display: flex;
     flex-wrap: wrap-reverse;
     position: relative;
@@ -17,8 +17,8 @@
     z-index: 2;
     text-align: right;
     font-size: 0.5rem;
-    width: calc(300px / 8);
-    height: calc(300px / 8);
+    width: calc(325px / 8);
+    height: calc(325px / 8);
     display: grid;
     place-items: center;
 }
@@ -30,7 +30,7 @@
 .tile-content.letter,
 .tile-content.number {
    font-family: 'Noto Sans Buhid', sans-serif;
-   font-size: 0.85rem; 
+   font-size: 0.5rem; 
 }
 
 .tile-content.letter {
@@ -47,13 +47,36 @@
     background-color: #efd9b5;
 }
 
+.circle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: green;
+}
+
 .tile.dark {
     background-color: #b48863;
     color: #fefefe;
 }
 
+.check-alert {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: rgba(223,0,0,0.60);
+    box-shadow: 0px 0px 10px 10px rgba(223,0,0,0.60);
+    position: absolute;
+    top: 40%;
+    left: 40%;
+
+}
+
+.piece-wrapper {
+    position: relative;
+}
+
 .piece {
-    width: 33px;
+    width: 38px;
     transition: all 0.3s ease;
     animation-name: bounce;
     animation-duration: 0.3s;
@@ -67,6 +90,17 @@
         height: 600px;
     }
 
+    .check-alert {
+        width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: rgba(223,0,0,0.60);
+    box-shadow: 0px 0px 17px 15px rgba(223,0,0,0.60);
+    position: absolute;
+    top: 30%;
+    left: 30%;
+    }
+
     .tile {
         width: calc(600px / 8);
         height: calc(600px / 8);
@@ -76,6 +110,12 @@
     .piece {
     width: 70px;
     }
+
+    .tile-content.letter,
+    .tile-content.number {
+   font-family: 'Noto Sans Buhid', sans-serif;
+   font-size: 0.85rem; 
+}
 }
 
 @keyframes bounce {

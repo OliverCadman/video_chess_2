@@ -8,11 +8,14 @@ class Square {
             The piece on the square (if any)
             The co-ordinates in pixels
     */
-  constructor(x, y, notation, pieceOnThisSquare) {
+  constructor(x, y, notation, pieceOnThisSquare, id) {
     this.x = x;
     this.y = y;
     this.notation = notation;
     this.pieceOnThisSquare = pieceOnThisSquare;
+    this.id = id;
+    this.availableX = [];
+    this.availableY = [];
   }
 
   userTriedToCaptureTheirOwnPiece(piece1, piece2) {
@@ -52,6 +55,7 @@ class Square {
   getPiece() {
     return this.pieceOnThisSquare;
   }
+
 }
 
 export default Square;

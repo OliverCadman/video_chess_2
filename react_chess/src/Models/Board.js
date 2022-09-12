@@ -8,22 +8,43 @@ class ChessBoard {
     this.chessBoard = this.createBoard();
 
     // Chess JS
-    this.chess = new Chess()
+    this.chess = new Chess();
+
+    this.alphabetToX = {
+      a: 0,
+      b: 1,
+      c: 2,
+      d: 3,
+      e: 4,
+      f: 5,
+      g: 6,
+      h: 7
+    }
+
+    this.rankToY = {
+      1: 0,
+      2: 1,
+      3: 2,
+      4: 3,
+      5: 4,
+      6: 5,
+      7: 6,
+      8: 7
+    }
   }
 
   getBoard() {
     return this.chessBoard;
   }
-  
+
   setBoard(newBoard) {
     this.chessBoard = newBoard;
   }
 
   movePiece(pieceID, to) {
-    
     const currentBoard = this.getBoard();
     const pieceCoordinates = this.findPiece(currentBoard, pieceID);
-  
+
     if (!pieceCoordinates) {
       return;
     }
@@ -35,28 +56,51 @@ class ChessBoard {
     const toSquareAlgebraNotation = currentBoard[to[1]][to[0]].notation;
 
     const pieceToMove = currentBoard[y][x].getPiece();
+    const pawnPromoted = this.isPawnPromotion(pieceID, to);
+    console.log(pawnPromoted)
 
     // Validate moves with chess.js
-    const moveAttempt = this.chess.move({
-      from: fromSquareAlgebraNotation,
-      to: toSquareAlgebraNotation,
-      piece: pieceID[1]
-    });
-    
+    const moveAttempt = pawnPromoted
+      ? this.chess.move({
+          from: fromSquareAlgebraNotation,
+          to: toSquareAlgebraNotation,
+          piece: pieceID[1],
+          promotion: "q"
+        })
+      : this.chess.move({
+          from: fromSquareAlgebraNotation,
+          to: toSquareAlgebraNotation,
+          piece: pieceID[1],
+        });
+
+
     if (moveAttempt) {
-        currentBoard[to[1]][to[0]].setPiece(
-          pieceToMove,
-          "calling set board..."
-        );
+      console.log("MOVE ATTEMPT", moveAttempt)
+      currentBoard[to[1]][to[0]].setPiece(pieceToMove, "calling set board...");
 
-        currentBoard[y][x].setPiece(null);
+      currentBoard[y][x].setPiece(null);
 
-        this.setBoard(currentBoard);
+      this.setBoard(currentBoard);
     } else if (moveAttempt === null) {
-      console.log('invalid move');
+
       return;
     } else if (moveAttempt.flags === "c") {
-      console.log("capture")
+      console.log("capture");
+    } else if (moveAttempt.flags === "p" || moveAttempt.flags === "cp") {
+      console.log("promotion");
+      const color = pieceID[0];
+      if (color === "w") {
+        console.log("promotion!")
+        currentBoard[to[1][0]].setPiece(
+          new ChessPiece("queen", false, "wq2", "white")
+        );
+      }
+    }
+
+    const check = this.chess.inCheck();
+    
+    if (check) {
+      return `${this.chess.turn()} in check`
     }
 
     //
@@ -65,14 +109,12 @@ class ChessBoard {
 
     const playerDidCastle = this.didCastle(moveAttempt);
     if (playerDidCastle) {
-
       // If player castled, update position of rook.
-      const {fromX, toX, fromY, toY} = playerDidCastle;
+      const { fromX, toX, fromY, toY } = playerDidCastle;
       let castlingRook = currentBoard[fromY][fromX].getPiece();
       currentBoard[toY][toX].setPiece(castlingRook);
       currentBoard[fromY][fromX].setPiece(null);
     }
-
 
     //
     // Determine circumstances when game is over.
@@ -82,10 +124,10 @@ class ChessBoard {
     const checkMate = this.chess.isCheckmate() ? true : false;
     if (checkMate) return this.chess.turn() + checkMate;
 
-
     // Threefold repetition
-    const threeFoldRepetition = this.chess.isThreefoldRepetition() ?
-                                true : false;
+    const threeFoldRepetition = this.chess.isThreefoldRepetition()
+      ? true
+      : false;
 
     if (threeFoldRepetition) return this.chess.turn() + threeFoldRepetition;
   }
@@ -94,14 +136,56 @@ class ChessBoard {
     for (let i = 0; i < 8; i++) {
       for (let j = 0; j < 8; j++) {
         if (currentBoard[i][j].getPieceIDOnSquare() === pieceID) {
-          return [j, i]
+          return [j, i];
         }
       }
     }
   }
 
-  didCastle(moveAttempt) {
+  canMovePiece(piece, squareThisPieceIsOn, x, y) {
+    const moves = this.chess.moves({
+      piece: piece,
+      square: squareThisPieceIsOn,
+      verbose: true
+    })
 
+    const availableMoves = [];
+
+    for (let move of moves) {
+        availableMoves.push([this.alphabetToX[move.to[0]], this.rankToY[move.to[1]]])
+      }
+
+    return availableMoves;
+  }
+
+ generateUUID() { // Public Domain/MIT
+    var d = new Date().getTime();//Timestamp
+    var d2 = ((typeof performance !== 'undefined') && performance.now && (performance.now()*1000)) || 0;//Time in microseconds since page-load or 0 if unsupported
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16;//random number between 0 and 16
+        if(d > 0){//Use timestamp until depleted
+            r = (d + r)%16 | 0;
+            d = Math.floor(d/16);
+        } else {//Use microseconds since page-load if supported
+            r = (d2 + r)%16 | 0;
+            d2 = Math.floor(d2/16);
+        }
+        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+}
+
+  isPawnPromotion(pieceID, to) {
+    console.log(pieceID, to)
+    const res = pieceID[1] === "p" && (to[1] === 7 || to[1] === 0);
+    console.log("res", res)
+    if (res) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  didCastle(moveAttempt) {
     /**
      * Check for castling attempt.
      * If castle, return position and destination
@@ -109,7 +193,7 @@ class ChessBoard {
      * King-side or Queen side castling, and color.
      */
 
-    const {from, to, piece} = moveAttempt;
+    const { from, to, piece } = moveAttempt;
 
     if (piece === "k") {
       if (from === "e1" && to === "c1") {
@@ -151,11 +235,9 @@ class ChessBoard {
       } else {
         return false;
       }
-    } 
+    }
     return false;
   }
-
-
 
   createBoard() {
     const board = [];
@@ -173,7 +255,8 @@ class ChessBoard {
             j,
             i,
             horizontalAxisSquares[j] + verticalAxisSquares[i],
-            null
+            null,
+            this.generateUUID()
           )
         );
       }
@@ -233,14 +316,13 @@ class ChessBoard {
             )
           );
         } else {
-            // Top (from white's perspective)
+          // Top (from white's perspective)
           board[i - 1][this.playerIsWhite ? j : 7 - j].setPiece(
             new ChessPiece(
               "pawn",
               false,
               this.playerIsWhite ? "bp" + (j + 1) : "wp" + (j + 1),
               this.playerIsWhite && "black"
-
             )
           );
           board[i][this.playerIsWhite ? j : 7 - j].setPiece(
