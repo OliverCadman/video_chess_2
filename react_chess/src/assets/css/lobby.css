@@ -26,7 +26,8 @@
 .header,
 .username-form p,
 .submit-btn,
-.username-input {
+.username-input,
+.room-portal-wrapper {
     font-family: 'Noto Sans Buhid', sans-serif;
 }
 
@@ -51,5 +52,18 @@
     border: 0;
     border-radius: 5px;
     cursor: pointer;
+}
+
+.room-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    column-gap: 0.5rem;
+    row-gap: 0.5rem;
+}
+
+.room-portal-wrapper {
+    background-color: #222;
+    color: #fafafa;
+    padding: 3rem;
 }
 
