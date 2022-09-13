@@ -8,6 +8,9 @@ import PieceStyles from "../../assets/pieces/piece_styles";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
+import { socket } from "../../connections/socket";
+
+
 const Chessboard = () => {
   const [chessBoard, setChessBoard] = useState(new ChessBoard(true));
   const [moveMade, setMoveMade] = useState(false);
@@ -45,6 +48,7 @@ const Chessboard = () => {
   };
 
   const canMovePiece = (pieceID, fromCoords, x, y) => {
+    console.log(pieceID)
     if (!pieceID) return;
     const availableMoves = chessBoard.canMovePiece(pieceID, fromCoords, x, y);
     for (let move of availableMoves) {

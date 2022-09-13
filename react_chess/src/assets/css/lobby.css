@@ -1,0 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Buhid&display=swap');
+
+
+.lobby-wrapper {
+    background-color: #222;
+    padding: 0 2rem 4rem;
+    border-radius: 13px;
+    height: 35%;
+}
+
+.header,
+.username-form p,
+.submit-btn {
+    color: #fafafa;
+}
+
+.header,
+.username-form p,
+.submit-btn,
+.username-input {
+    font-family: 'Noto Sans Buhid', sans-serif;
+}
+
+.username-input,
+.submit-btn {
+    font-size: 1.15rem;
+
+}
+
+.username-input,
+.submit-btn {
+    padding: 0.5rem;
+    width: 100%;
+}
+
+.submit-btn-wrapper {
+    margin-top: 1rem;
+}
+
+.submit-btn {
+    background-color: rgb(15, 101, 15);
+    border: 0;
+    border-radius: 5px;
+}
+

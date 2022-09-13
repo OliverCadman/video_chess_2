@@ -6,13 +6,17 @@ import { ItemTypes } from '../../DragDrop/constants';
 import {useDrag} from 'react-dnd';
 
 const ChessPiece = (props) => {
+    console.log(props.square)
 
     const pieceRef = useRef(null);
-
+    let pieceID;
     const [{isDragging}, dragRef] = useDrag(() => {
+        if (props.square.pieceOnThisSquare) {
+            pieceID = props.square.pieceOnThisSquare.id
+        }
         return {
           item: {
-            pieceID: props.pieceID,
+            pieceID: pieceID,
             square: props.square,
           },
           type: ItemTypes.PIECE,
