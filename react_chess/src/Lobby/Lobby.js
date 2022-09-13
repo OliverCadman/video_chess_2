@@ -1,65 +1,50 @@
 import React, { useState } from "react";
+import Form from "./Form";
 import "../assets/css/lobby.css";
 
 import { socket } from "../connections/socket";
 
 import { v4 as uuid } from "uuid";
 
+import { useNavigate } from "react-router-dom";
+
 const Lobby = () => {
-  const DOMAIN_URL = "http://localhost:3001/";
-  const [didSend, setDidSend] = useState(false);
-  const [gameId, setGameId] = useState("");
+  const [userName, setUserName] = useState("");
+  const [error, setError] = useState(false);
+
+  const navigate = useNavigate();
+
+  const handleUserName = (input) => {
+    if (!input) {
+      setError(true);
+    } else {
+      setError(false);
+      setUserName(input);
+    }
+  };
 
   const send = (e) => {
     e.preventDefault();
-    const gameId = uuid();
-    socket.emit("createNewGame", gameId);
-    setGameId(gameId);
-    setDidSend(true);
-
+    if (!userName) {
+      setError(true);
+    } else {
+      setError(false);
+      const gameID = uuid();
+      const openSocket = socket.emit("createNewGame", {
+        gameID: gameID,
+        userName: {
+            creator: userName
+        }
+      });
+      if (openSocket) {
+        navigate(`game/${gameID}`);
+      }
+    }
   };
-
-  const copyURL = (e) => {
-    e.preventDefault();
-    const fullURL = `${DOMAIN_URL}${gameId}`;
-    navigator.clipboard.writeText(fullURL);
-  }
-
-
   return (
-    <article className="lobby-wrapper">
-      <div className="header">
-        <h1>Welcome</h1>
-      </div>
-      <hr />
-      <div className="username-form">
-        <p>Please enter your username</p>
-        <form>
-          <div>
-            <input type="text" className="username-input" />
-          </div>
-          <div className="submit-btn-wrapper">
-            {!didSend ? (
-              <button
-                type="submit"
-                className="submit-btn"
-                onClick={(e) => send(e)}
-              >
-                Submit
-              </button>
-            ) : (
-              <button
-                type="submit"
-                className="submit-btn"
-                onClick={(e) => copyURL(e)}
-              >
-                Copy this URL and send to your friend.
-              </button>
-            )}
-          </div>
-        </form>
-      </div>
-    </article>
+    <div className="lobby-container">
+      <Form handleUserName={handleUserName} error={error} send={send} />
+    </div>
   );
 };
 

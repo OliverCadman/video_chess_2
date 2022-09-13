@@ -1,5 +1,11 @@
 import './App.css';
 
+import {
+  BrowserRouter,
+  Routes,
+  Route
+} from 'react-router-dom';
+
 
 // import { socket } from './connections/socket';
 import Lobby from './Lobby/Lobby';
@@ -9,13 +15,16 @@ function App() {
 
   return (
     <div className="app">
-      <Lobby />
-      <Chessboard />
-      <div>
-        Some content
-      </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path='/' exact element={<Lobby />}></Route>
+        <Route path='/game/:gameid' element={<Chessboard/>}/>
+      </Routes>
+    </BrowserRouter>
+      
     </div>
   );
 }
+
 
 export default App;

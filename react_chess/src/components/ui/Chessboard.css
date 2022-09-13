@@ -1,5 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Buhid&display=swap');
 
+.chessboard-wrapper {
+    display: grid;
+    place-items: center;
+    height: 100%;
+}
+
 #chessboard {
     height: 325px;
     width: 325px;

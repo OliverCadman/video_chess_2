@@ -10,7 +10,6 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 
 import { socket } from "../../connections/socket";
 
-
 const Chessboard = () => {
   const [chessBoard, setChessBoard] = useState(new ChessBoard(true));
   const [moveMade, setMoveMade] = useState(false);
@@ -33,8 +32,8 @@ const Chessboard = () => {
 
   const handlePieceMove = (pieceID, toCoords) => {
     const move = chessBoard.movePiece(pieceID, toCoords);
-    
-    if (move === 'w in check') {
+
+    if (move === "w in check") {
       setWhiteInCheck(true);
     } else if (move === "b in check") {
       setBlackInCheck(true);
@@ -48,7 +47,7 @@ const Chessboard = () => {
   };
 
   const canMovePiece = (pieceID, fromCoords, x, y) => {
-    console.log(pieceID)
+    console.log(pieceID);
     if (!pieceID) return;
     const availableMoves = chessBoard.canMovePiece(pieceID, fromCoords, x, y);
     for (let move of availableMoves) {
@@ -60,50 +59,54 @@ const Chessboard = () => {
   };
 
   return (
-    <DndProvider backend={HTML5Backend}>
-      <div id="chessboard">
-        {startingBoard.map((row, index) => {
-          let outerCount = index;
-          return (
-            <React.Fragment key={index}>
-              {row.map((square, index) => {
-                const isPieceOnThisSquare = Boolean(square.pieceOnThisSquare);
-                const tileLetterAndNumber = square.notation.split("");
-                const tileLetter = tileLetterAndNumber[0];
-                const tileNumber = tileLetterAndNumber[1];
-                let innerCount = index;
-                const tileCount = outerCount + innerCount + 2;
-                return (
-                  <Tile
-                    key={index}
-                    index={index}
-                    tileCount={tileCount}
-                    tileLetter={tileLetter}
-                    tileNumber={tileNumber}
-                    outerCount={outerCount}
-                    imageUrl={
-                      PieceStyles[
-                        isPieceOnThisSquare && square.pieceOnThisSquare.name
-                      ]
-                    }
-                    isPieceOnThisSquare={isPieceOnThisSquare}
-                    playerColor={
-                      isPieceOnThisSquare && square.pieceOnThisSquare.color
-                    }
-                    pieceID={isPieceOnThisSquare && square.pieceOnThisSquare.id}
-                    handlePieceMove={handlePieceMove}
-                    square={square}
-                    canMovePiece={canMovePiece}
-                    blackInCheck={blackInCheck}
-                    whiteInCheck={whiteInCheck}
-                  ></Tile>
-                );
-              })}
-            </React.Fragment>
-          );
-        })}
-      </div>
-    </DndProvider>
+    <div className="chessboard-wrapper">
+      <DndProvider backend={HTML5Backend}>
+        <div id="chessboard">
+          {startingBoard.map((row, index) => {
+            let outerCount = index;
+            return (
+              <React.Fragment key={index}>
+                {row.map((square, index) => {
+                  const isPieceOnThisSquare = Boolean(square.pieceOnThisSquare);
+                  const tileLetterAndNumber = square.notation.split("");
+                  const tileLetter = tileLetterAndNumber[0];
+                  const tileNumber = tileLetterAndNumber[1];
+                  let innerCount = index;
+                  const tileCount = outerCount + innerCount + 2;
+                  return (
+                    <Tile
+                      key={index}
+                      index={index}
+                      tileCount={tileCount}
+                      tileLetter={tileLetter}
+                      tileNumber={tileNumber}
+                      outerCount={outerCount}
+                      imageUrl={
+                        PieceStyles[
+                          isPieceOnThisSquare && square.pieceOnThisSquare.name
+                        ]
+                      }
+                      isPieceOnThisSquare={isPieceOnThisSquare}
+                      playerColor={
+                        isPieceOnThisSquare && square.pieceOnThisSquare.color
+                      }
+                      pieceID={
+                        isPieceOnThisSquare && square.pieceOnThisSquare.id
+                      }
+                      handlePieceMove={handlePieceMove}
+                      square={square}
+                      canMovePiece={canMovePiece}
+                      blackInCheck={blackInCheck}
+                      whiteInCheck={whiteInCheck}
+                    ></Tile>
+                  );
+                })}
+              </React.Fragment>
+            );
+          })}
+        </div>
+      </DndProvider>
+    </div>
   );
 };
 
