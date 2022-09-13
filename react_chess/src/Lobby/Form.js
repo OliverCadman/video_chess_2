@@ -1,5 +1,4 @@
-import React, {useState} from 'react';
-import {v4 as uuid} from 'uuid';
+import React from 'react';
 
 const Form = ({handleUserName, error, send}) => {
   return (
@@ -12,7 +11,7 @@ const Form = ({handleUserName, error, send}) => {
               <button className="submit-btn">Create A Game</button>
             </div>
         </form>
-        {error && (
+        {error.userNameError && (
           <div className="error-wrapper">
             <p>Please enter a username.</p>
           </div>

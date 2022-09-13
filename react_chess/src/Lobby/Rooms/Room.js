@@ -1,10 +1,31 @@
 import React from 'react'
 
-const Room = ({creatorUserName, gameID, joinRoom}) => {
+const Room = ({gameID, handleOpponentUserName, joinRoom, error}) => {
   return (
     <article className="room-portal-wrapper">
-      <h4>{creatorUserName}</h4>
-      <button className="submit-btn" onClick={() => joinRoom(gameID)}>Join Game</button>
+      <h1>Opponent: </h1>
+      <p>Please type your username:</p>
+      <form>
+        <input
+          type="text"
+          onChange={(e) => handleOpponentUserName(e.target.value)}
+          className="username-input"
+        />
+        {error.opponentUserNameError && (
+            <p>
+                Please enter a username.
+            </p>
+        )}
+        <div className="submit-btn-wrapper">
+          <button
+            className="submit-btn"
+            type="button"
+            onClick={() => joinRoom(gameID)}
+          >
+            Join Game
+          </button>
+        </div>
+      </form>
     </article>
   );
 }

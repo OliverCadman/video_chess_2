@@ -11,36 +11,75 @@ import RoomWrapper from "./Rooms/RoomWrapper";
 
 const Lobby = () => {
   const [userName, setUserName] = useState("");
-  const [error, setError] = useState(false);
+  const [opponentUserName, setOpponentUserName] = useState("");
+  const [error, setError] = useState({
+    userNameError: false,
+    opponentUserNameError: false
+  });
+
   const [games, setGames] = useState(null);
 
   useEffect(() => {
-    socket.emit("findAllGames");
+     socket.emit("findAllGames");
 
-    socket.on("listAllGames", (data) => {
-      if (data) {
-        setGames(data);
-      }
-    });
-  }, []);
+     socket.on("listAllGames", (data) => {
+       if (data) {
+         setGames(data);
+       }
+     });
+  }, [])
+
+  useEffect(() => {
+
+    socket.on('connectToRoom', data => {
+        console.log(data)
+    })
+  }, [opponentUserName]);
 
   const navigate = useNavigate();
 
   const handleUserName = (input) => {
     if (!input) {
-      setError(true);
+      setError({
+        ...error,
+        userNameError: true
+      });
     } else {
-      setError(false);
+      setError({
+        ...error,
+        userNameError: false
+      });
       setUserName(input);
     }
   };
 
+  const handleOpponentUserName = (input) => {
+    if (!input) {
+        setError({
+            ...error,
+            opponentUserNameError: true
+        });
+    } else {
+        setError({
+            ...error,
+            opponentUserNameError: false
+        });
+        setOpponentUserName(input);
+    }
+  }
+
   const send = (e) => {
     e.preventDefault();
     if (!userName) {
-      setError(true);
+      setError({
+        ...error,
+        userNameError: true
+      });
     } else {
-      setError(false);
+      setError({
+        ...error,
+        userNameError: false
+      });
       const gameID = uuid();
       const openSocket = socket.emit("createNewGame", {
         gameID: gameID,
@@ -55,12 +94,37 @@ const Lobby = () => {
   };
 
   const joinRoom = (gameID) => {
-    console.log("game id", gameID);
+    if (!opponentUserName) {
+        setError({
+            ...error,
+            opponentUserNameError: true
+        });
+    } else {
+        setError({
+            ...error,
+            opponentUserNameError: false
+        });
+        const joinData = {
+            gameID: gameID,
+            opponentUserName: opponentUserName
+        }
+
+        console.log(joinData)
+
+        socket.emit("playerJoinedGame", {
+            gameID: gameID,
+            opponentUserName: opponentUserName
+        })
+    }
   };
   return (
     <div className="lobby-container">
       <Form handleUserName={handleUserName} error={error} send={send} />
-      <RoomWrapper games={games} joinRoom={joinRoom} />
+      <RoomWrapper
+      games={games}
+      joinRoom={joinRoom}
+      handleOpponentUserName={handleOpponentUserName}
+      error={error} />
     </div>
   );
 };

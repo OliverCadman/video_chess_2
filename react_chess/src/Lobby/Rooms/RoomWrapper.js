@@ -3,7 +3,7 @@ import { socket } from '../../connections/socket';
 
 import Room from './Room';
 
-const RoomWrapper = ({games, joinRoom}) => {
+const RoomWrapper = ({games, joinRoom, handleOpponentUserName, error}) => {
   return (
     <>
       {games &&
@@ -12,13 +12,14 @@ const RoomWrapper = ({games, joinRoom}) => {
             <React.Fragment key={index}>
               {gameArray.map((game, index) => {
                 if (Object.keys(game).length > 0) {
-                  console.log(game);
+                    console.log(game)
                   return (
                     <Room 
                     key={index} 
-                    gameID={game.gameID}
-                    creatorUserName={game.userName.creator}
+                    gameID={game}
                     joinRoom={joinRoom}
+                    handleOpponentUserName={handleOpponentUserName}
+                    error={error}
                      />
                   );
                 }
