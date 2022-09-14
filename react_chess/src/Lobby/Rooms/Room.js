@@ -1,9 +1,9 @@
 import React from 'react'
 
-const Room = ({gameID, handleOpponentUserName, joinRoom, error}) => {
+const Room = ({gameID, handleOpponentUserName, joinRoom, error, creator}) => {
   return (
     <article className="room-portal-wrapper">
-      <h1>Opponent: </h1>
+      <h1>Opponent: {creator}</h1>
       <p>Please type your username:</p>
       <form>
         <input
