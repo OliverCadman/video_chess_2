@@ -15,12 +15,11 @@ const Tile = (props) => {
   const [{ isOver, data, canDrop }, drop] = useDrop(() => ({
     accept: ItemTypes.PIECE,
     drop: (data, monitor) => {   
-      props.handlePieceMove(data.square.pieceOnThisSquare.id, [xCoord, yCoord]);
+      props.endDrag(data.square.pieceOnThisSquare.id, [xCoord, yCoord], data.square.getNormalizedCoords(), true);
     },
     collect: (monitor) => {
       if (monitor.getItem()) {
         const item = monitor.getItem();
-        console.log("ITEM", item)
         pieceOnThisSquare = item.pieceID[1];
         notation = item.square.notation;
       }
@@ -55,10 +54,9 @@ const Tile = (props) => {
       <ChessPiece
         imageUrl={props.imageUrl}
         isPieceOnThisSquare={props.isPieceOnThisSquare}
-        playerColor={props.playerColor}
+        isWhite={props.isWhite}
         pieceID={props.pieceID}
         square={props.square}
-        chessBoard={props.chessBoard}
         blackInCheck={props.blackInCheck}
         whiteInCheck={props.whiteInCheck}
       />

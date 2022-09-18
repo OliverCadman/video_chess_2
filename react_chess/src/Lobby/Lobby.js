@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { ColorContext } from "../context/ColorContext";
 import Form from "./Form";
 import "../assets/css/lobby.css";
 
@@ -18,6 +19,8 @@ const Lobby = () => {
   });
 
   const [games, setGames] = useState(null);
+
+  const color = useContext(ColorContext);
 
   useEffect(() => {
      socket.emit("findAllGames");
@@ -88,6 +91,7 @@ const Lobby = () => {
         },
       });
       if (openSocket) {
+        color.playerIsCreator()
         navigate(`game/${gameID}`);
       }
     }
@@ -104,17 +108,15 @@ const Lobby = () => {
             ...error,
             opponentUserNameError: false
         });
-        const joinData = {
-            gameID: gameID,
-            opponentUserName: opponentUserName
-        }
-
-        console.log(joinData)
-
-        socket.emit("playerJoinedGame", {
+    
+        const connectionAttempt = socket.emit("playerJoinedGame", {
             gameID: gameID,
             opponentUserName: opponentUserName
         })
+
+       if (connectionAttempt.connected) {
+          navigate(`game/${gameID}`)
+       }
     }
   };
   return (

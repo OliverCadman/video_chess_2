@@ -1,7 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
+import { useParams } from "react-router-dom";
 import "./Chessboard.css";
 import ChessBoard from "../../Models/Board";
 import Tile from "./Tile";
+
+import { ColorContext } from "../../context/ColorContext";
 
 import PieceStyles from "../../assets/pieces/piece_styles";
 
@@ -10,44 +13,77 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 
 import { socket } from "../../connections/socket";
 
-const Chessboard = () => {
-  const [chessBoard, setChessBoard] = useState(new ChessBoard(true));
+const ChessGame = ({gameID}) => {
+
+  const color = useContext(ColorContext);
+
+  const [chessBoard, setChessBoard] = useState(new ChessBoard(color.isCreator));
   const [moveMade, setMoveMade] = useState(false);
   const [whiteInCheck, setWhiteInCheck] = useState(false);
   const [blackInCheck, setBlackInCheck] = useState(false);
+  const [whiteTurnToMove, setWhiteTurnToMove] = useState(true);
 
   const prevGameState = useRef(null);
 
-  // useEffect(() => {
-  //   prevGameState.current = chessBoard;
-  //   console.log(prevGameState)
-  // }, [])
+
+  useEffect(() => {
+    socket.on("opponent move", (move) => {
+      if (move.playerThatMadeMoveIsWhite !== color.isCreator) {
+        handlePieceMove(move.pieceID, move.toCoords, false, "from opponent move");
+        setWhiteTurnToMove(!move.playerThatMadeMoveIsWhite);
+      }
+    }, [socket]);
+
+
+  }, [])
 
   useEffect(() => {
     prevGameState.current = chessBoard;
     setMoveMade(false);
   }, [moveMade]);
 
+
+
   const startingBoard = chessBoard.getBoard();
 
-  const handlePieceMove = (pieceID, toCoords) => {
-    const move = chessBoard.movePiece(pieceID, toCoords);
+  const handlePieceMove = (pieceID, toCoords, isMyMove) => {
+
+    const move = chessBoard.movePiece(pieceID, toCoords, isMyMove);
+
+    let whiteKingInCheck;
+    let blackKingInCheck;
+    let whiteMated;
+    let blackMated;
 
     if (move === "w in check") {
-      setWhiteInCheck(true);
+      whiteKingInCheck = true;
     } else if (move === "b in check") {
-      setBlackInCheck(true);
-    } else {
-      setWhiteInCheck(false);
-      setBlackInCheck(false);
+      blackKingInCheck = true;
     }
+    if (isMyMove) {
+      socket.emit("new move", {
+        nextPlayerToMove: !chessBoard.playerIsWhite,
+        playerThatMadeMoveIsWhite: chessBoard.playerIsWhite,
+        pieceID: pieceID,
+        toCoords,
+        gameID,
+      });
 
+    }
+    
     setChessBoard(chessBoard);
     setMoveMade(true);
+    setBlackInCheck(blackKingInCheck);
+    setWhiteInCheck(whiteKingInCheck);
+    setWhiteTurnToMove(!color);
+
   };
 
+  const endDrag = (pieceID, toCoords) => {
+    handlePieceMove(pieceID, toCoords, true);
+  }
+
   const canMovePiece = (pieceID, fromCoords, x, y) => {
-    console.log(pieceID);
     if (!pieceID) return;
     const availableMoves = chessBoard.canMovePiece(pieceID, fromCoords, x, y);
     for (let move of availableMoves) {
@@ -87,13 +123,13 @@ const Chessboard = () => {
                         ]
                       }
                       isPieceOnThisSquare={isPieceOnThisSquare}
-                      playerColor={
-                        isPieceOnThisSquare && square.pieceOnThisSquare.color
+                      isWhite={
+                        isPieceOnThisSquare && (square.getPiece().color === "white")
                       }
                       pieceID={
                         isPieceOnThisSquare && square.pieceOnThisSquare.id
                       }
-                      handlePieceMove={handlePieceMove}
+                      endDrag={endDrag}
                       square={square}
                       canMovePiece={canMovePiece}
                       blackInCheck={blackInCheck}
@@ -110,4 +146,29 @@ const Chessboard = () => {
   );
 };
 
-export default Chessboard;
+const ChessBoardWrapper = () => {
+  const [opponentUserName, setOpponentUserName] = useState('');
+  const { gameid } = useParams();
+
+
+  useEffect(() => {
+    socket.on('playerJoinedGame', data => {
+      setOpponentUserName(data.opponentUserName);
+    socket.on('disconnected', () => {
+      socket.emit('deleteGame', gameid)
+    })
+    }, [socket])
+
+    return () => {
+      socket.off('playerJoinedGame');
+    }
+  })
+  return (
+    <ChessGame gameID={gameid}/>
+  )
+};
+
+
+export default ChessBoardWrapper;
+
+

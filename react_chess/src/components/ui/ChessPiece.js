@@ -6,7 +6,7 @@ import { ItemTypes } from '../../DragDrop/constants';
 import {useDrag} from 'react-dnd';
 
 const ChessPiece = (props) => {
-    console.log(props.square)
+
 
     const pieceRef = useRef(null);
     let pieceID;
@@ -30,13 +30,13 @@ const ChessPiece = (props) => {
           }
         };
     }
-    ,[props.chessBoard]);
+    ,[]);
 
     const isBlackInCheck = props.pieceID === "bk1" && props.blackInCheck;
     const isWhiteInCheck = props.pieceID === "wk1" && props.whiteInCheck;
 
 
-  const colorIndex = props.playerColor === "white" ? 0 : 1
+  const colorIndex = props.isWhite ? 1 : 0;
   if (props.imageUrl !== undefined) {
     return (
       <div className="piece-wrapper">

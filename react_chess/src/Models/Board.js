@@ -5,7 +5,6 @@ import { Chess } from "chess.js";
 class ChessBoard {
   constructor(playerIsWhite) {
     this.playerIsWhite = playerIsWhite;
-    this.chessBoard = this.createBoard();
 
     // Chess JS
     this.chess = new Chess();
@@ -18,8 +17,8 @@ class ChessBoard {
       e: 4,
       f: 5,
       g: 6,
-      h: 7
-    }
+      h: 7,
+    };
 
     this.rankToY = {
       1: 0,
@@ -29,8 +28,32 @@ class ChessBoard {
       5: 4,
       6: 5,
       7: 6,
-      8: 7
-    }
+      8: 7,
+    };
+
+    this.fromCoordinates = {
+      0: 1,
+      1: 2,
+      2: 3,
+      3: 4,
+      4: 5,
+      5: 6,
+      6: 7,
+      7: 8,
+    };
+
+    this.fromAlphabet = {
+      0: "a",
+      1: "b",
+      2: "c",
+      3: "d",
+      4: "e",
+      5: "f",
+      6: "g",
+      7: "h",
+    };
+
+    this.chessBoard = this.createBoard(this.alphabetToX, this.rankToY);
   }
 
   getBoard() {
@@ -41,48 +64,52 @@ class ChessBoard {
     this.chessBoard = newBoard;
   }
 
-  movePiece(pieceID, to) {
+  convertBoardCoords(coords) {
+    return [7 - coords[0], 7 - coords[1]]
+  }
+
+  movePiece(pieceID, to, isMyMove) {
+
     const currentBoard = this.getBoard();
     const pieceCoordinates = this.findPiece(currentBoard, pieceID);
 
     if (!pieceCoordinates) {
       return;
     }
-
     const x = pieceCoordinates[0];
     const y = pieceCoordinates[1];
 
     const fromSquareAlgebraNotation = currentBoard[y][x].notation;
-    const toSquareAlgebraNotation = currentBoard[to[1]][to[0]].notation;
 
     const pieceToMove = currentBoard[y][x].getPiece();
     const pawnPromoted = this.isPawnPromotion(pieceID, to);
-    console.log(pawnPromoted)
 
     // Validate moves with chess.js
     const moveAttempt = pawnPromoted
       ? this.chess.move({
           from: fromSquareAlgebraNotation,
-          to: toSquareAlgebraNotation,
+          to: this.toChessMove([to[0], to[1]]),
           piece: pieceID[1],
-          promotion: "q"
+          promotion: "q",
         })
       : this.chess.move({
           from: fromSquareAlgebraNotation,
-          to: toSquareAlgebraNotation,
+          to: this.toChessMove([to[0], to[1]]),
           piece: pieceID[1],
         });
 
-
     if (moveAttempt) {
-      console.log("MOVE ATTEMPT", moveAttempt)
-      currentBoard[to[1]][to[0]].setPiece(pieceToMove, "calling set board...");
+      if (isMyMove) {
+        currentBoard[to[1]][to[0]].setPiece(pieceToMove);
+      } else {
+        const [x, y] = this.convertBoardCoords(to);
+        currentBoard[y][x].setPiece(pieceToMove);
+      }
 
       currentBoard[y][x].setPiece(null);
 
       this.setBoard(currentBoard);
     } else if (moveAttempt === null) {
-
       return;
     } else if (moveAttempt.flags === "c") {
       console.log("capture");
@@ -90,7 +117,7 @@ class ChessBoard {
       console.log("promotion");
       const color = pieceID[0];
       if (color === "w") {
-        console.log("promotion!")
+        console.log("promotion!");
         currentBoard[to[1][0]].setPiece(
           new ChessPiece("queen", false, "wq2", "white")
         );
@@ -98,9 +125,9 @@ class ChessBoard {
     }
 
     const check = this.chess.inCheck();
-    
+
     if (check) {
-      return `${this.chess.turn()} in check`
+      return `${this.chess.turn()} in check`;
     }
 
     //
@@ -132,52 +159,90 @@ class ChessBoard {
     if (threeFoldRepetition) return this.chess.turn() + threeFoldRepetition;
   }
 
-  findPiece(currentBoard, pieceID) {
+  toChessMove(finalPosition) {
+    /*
+      Convert the co-ordinates passed as arguments
+      into a format readable by the chess.js object.
+    */
+
+    const move =
+      this.fromAlphabet[finalPosition[0]] +
+      this.fromCoordinates[finalPosition[1]];
+
+    return move;
+  }
+
+  findPiece(currentBoard, pieceID, message) {
     for (let i = 0; i < 8; i++) {
       for (let j = 0; j < 8; j++) {
         if (currentBoard[i][j].getPieceIDOnSquare() === pieceID) {
-          return [j, i];
+          return [currentBoard[i][j].x, currentBoard[i][j].y];
         }
       }
     }
+
+    // const squareOnRow = currentBoard.map((row) => {
+    //   return row.reduce((array, square) => {
+    //     if (square.getPieceIDOnSquare() === pieceID) {
+    //       array.push(square);
+    //     }
+
+    //     return array;
+    //   }, [])
+    // })
+
+    // const specificSquare = squareOnRow.filter(square => square.length !== 0);
+
+    // return [specificSquare[0][0].x, specificSquare[0][0].y]
   }
 
   canMovePiece(piece, squareThisPieceIsOn, x, y) {
     const moves = this.chess.moves({
       piece: piece,
       square: squareThisPieceIsOn,
-      verbose: true
-    })
+      verbose: true,
+    });
 
     const availableMoves = [];
 
     for (let move of moves) {
-        availableMoves.push([this.alphabetToX[move.to[0]], this.rankToY[move.to[1]]])
-      }
+      availableMoves.push([
+        this.alphabetToX[move.to[0]],
+        this.rankToY[move.to[1]],
+      ]);
+    }
 
     return availableMoves;
   }
 
- generateUUID() { // Public Domain/MIT
-    var d = new Date().getTime();//Timestamp
-    var d2 = ((typeof performance !== 'undefined') && performance.now && (performance.now()*1000)) || 0;//Time in microseconds since page-load or 0 if unsupported
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = Math.random() * 16;//random number between 0 and 16
-        if(d > 0){//Use timestamp until depleted
-            r = (d + r)%16 | 0;
-            d = Math.floor(d/16);
-        } else {//Use microseconds since page-load if supported
-            r = (d2 + r)%16 | 0;
-            d2 = Math.floor(d2/16);
+  generateUUID() {
+    // Public Domain/MIT
+    var d = new Date().getTime(); //Timestamp
+    var d2 =
+      (typeof performance !== "undefined" &&
+        performance.now &&
+        performance.now() * 1000) ||
+      0; //Time in microseconds since page-load or 0 if unsupported
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+      /[xy]/g,
+      function (c) {
+        var r = Math.random() * 16; //random number between 0 and 16
+        if (d > 0) {
+          //Use timestamp until depleted
+          r = (d + r) % 16 | 0;
+          d = Math.floor(d / 16);
+        } else {
+          //Use microseconds since page-load if supported
+          r = (d2 + r) % 16 | 0;
+          d2 = Math.floor(d2 / 16);
         }
-        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-    });
-}
+        return (c === "x" ? r : r & (0x3 | 0x8)).toString(16);
+      }
+    );
+  }
 
   isPawnPromotion(pieceID, to) {
-    console.log(pieceID, to)
     const res = pieceID[1] === "p" && (to[1] === 7 || to[1] === 0);
-    console.log("res", res)
     if (res) {
       return true;
     } else {
@@ -239,24 +304,32 @@ class ChessBoard {
     return false;
   }
 
-  createBoard() {
+  createBoard(alphabetToX, rankToY) {
     const board = [];
-    const horizontalAxisSquares = ["a", "b", "c", "d", "e", "f", "g", "h"];
+    const horizontalAxisSquares = this.playerIsWhite
+      ? ["a", "b", "c", "d", "e", "f", "g", "h"]
+      : ["h", "g", "f", "e", "d", "c", "b", "a"];
 
-    const verticalAxisSquares = ["1", "2", "3", "4", "5", "6", "7", "8"];
+    const verticalAxisSquares = this.playerIsWhite
+      ? ["1", "2", "3", "4", "5", "6", "7", "8"]
+      : ["8", "7", "6", "5", "4", "3", "2", "1"];
 
     // Populate board with square co-ordinates.
     for (let i = 0; i < horizontalAxisSquares.length; i++) {
       board.push([]);
       for (let j = 0; j < verticalAxisSquares.length; j++) {
-        // console.log(j, i)
+        const xAxisLetters = horizontalAxisSquares[j];
+        const yAxisNumbers = verticalAxisSquares[i];
+
+        const normalizedCoordinates = [(j + 1) * 82 + 15, (i + 1) * 82 + 15];
         board[i].push(
           new Square(
             j,
             i,
             horizontalAxisSquares[j] + verticalAxisSquares[i],
             null,
-            this.generateUUID()
+            this.generateUUID(),
+            normalizedCoordinates
           )
         );
       }
@@ -303,16 +376,16 @@ class ChessBoard {
             new ChessPiece(
               backrank[j],
               false,
-              this.playerIsWhite && whiteBackRankId[j],
-              this.playerIsWhite && "white"
+              this.playerIsWhite ? blackBackRankId[j] : whiteBackRankId[j],
+              this.playerIsWhite ? "black" : "white"
             )
           );
           board[i + 1][this.playerIsWhite ? j : 7 - j].setPiece(
             new ChessPiece(
               "pawn",
               false,
-              this.playerIsWhite ? "wp" + (j + 1) : "bp" + i,
-              this.playerIsWhite && "white"
+              this.playerIsWhite ? "bp" + (j + 1) : "wp" + (j + 1),
+              this.playerIsWhite ? "black" : "white"
             )
           );
         } else {
@@ -321,16 +394,16 @@ class ChessBoard {
             new ChessPiece(
               "pawn",
               false,
-              this.playerIsWhite ? "bp" + (j + 1) : "wp" + (j + 1),
-              this.playerIsWhite && "black"
+              this.playerIsWhite ? "wp" + (j + 1) : "bp" + (j + 1),
+              this.playerIsWhite ? "white" : "black"
             )
           );
           board[i][this.playerIsWhite ? j : 7 - j].setPiece(
             new ChessPiece(
               backrank[j],
               false,
-              this.playerIsWhite && blackBackRankId[j],
-              this.playerIsWhite && "black"
+              this.playerIsWhite ? whiteBackRankId[j] : blackBackRankId[j],
+              this.playerIsWhite ? "white" : "black"
             )
           );
         }

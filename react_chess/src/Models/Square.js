@@ -8,7 +8,7 @@ class Square {
             The piece on the square (if any)
             The co-ordinates in pixels
     */
-  constructor(x, y, notation, pieceOnThisSquare, id) {
+  constructor(x, y, notation, pieceOnThisSquare, id, normalizedCoordinates) {
     this.x = x;
     this.y = y;
     this.notation = notation;
@@ -16,13 +16,15 @@ class Square {
     this.id = id;
     this.availableX = [];
     this.availableY = [];
+
+    this.normalizedCoordinates = normalizedCoordinates;
   }
 
   userTriedToCaptureTheirOwnPiece(piece1, piece2) {
     return piece1.id === piece2.id;
   }
 
-  setPiece(newPiece, message) {
+  setPiece(newPiece) {
     if (newPiece === null && this.pieceOnThisSquare === null) {
       return;
     } else if (newPiece === null) {
@@ -43,7 +45,7 @@ class Square {
     }
   }
 
-  getPieceIDOnSquare() {
+  getPieceIDOnSquare(message) {
     // console.log(this)
     if (this.pieceOnThisSquare === null) {
       return "square is empty";
@@ -54,6 +56,14 @@ class Square {
 
   getPiece() {
     return this.pieceOnThisSquare;
+  }
+
+  isOccupied() {
+    return this.pieceOnThisSquare != null;
+  }
+
+  getNormalizedCoords() {
+    return this.normalizedCoordinates;
   }
 
 }

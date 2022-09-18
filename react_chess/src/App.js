@@ -6,23 +6,40 @@ import {
   Route
 } from 'react-router-dom';
 
+import React, {useState, useCallback} from 'react';
+
+import { ColorContext } from './context/ColorContext';
+
 
 // import { socket } from './connections/socket';
 import Lobby from './Lobby/Lobby';
-import Chessboard from './components/ui/Chessboard';
+import ChessboardWrapper from './components/ui/Chessboard';
 
 function App() {
+  const [isCreator, setIsCreator] = useState(false);
 
+  const playerIsCreator = useCallback(() => {
+    setIsCreator(true);
+  }, []);
+
+  const playerIsNotCreator = useCallback(() => {
+    setIsCreator(false);
+  }, [])
   return (
-    <div className="app">
-    <BrowserRouter>
-      <Routes>
-        <Route path='/' exact element={<Lobby />}></Route>
-        <Route path='/game/:gameid' element={<Chessboard/>}/>
-      </Routes>
-    </BrowserRouter>
-      
-    </div>
+    <ColorContext.Provider value={{
+      isCreator,
+      playerIsCreator,
+      playerIsNotCreator
+    }}>
+      <div className="app">
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" exact element={<Lobby />}></Route>
+            <Route path="/game/:gameid" element={<ChessboardWrapper />} />
+          </Routes>
+        </BrowserRouter>
+      </div>
+    </ColorContext.Provider>
   );
 }
 
