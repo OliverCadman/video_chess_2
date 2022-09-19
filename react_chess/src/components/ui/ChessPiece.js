@@ -32,11 +32,17 @@ const ChessPiece = (props) => {
     }
     ,[]);
 
+    const canPieceBeMovedByThisPlayer = props.isWhite === props.isPlayerWhite;
+    // console.group("PIECE INFO");
+    // console.log("is piece white?", props.isWhite);
+    // console.log("is player white?", props.isPlayerWhite);
+    // console.log("can piece be moved by player?", canPieceBeMovedByThisPlayer);
+    // console.groupEnd();
     const isBlackInCheck = props.pieceID === "bk1" && props.blackInCheck;
     const isWhiteInCheck = props.pieceID === "wk1" && props.whiteInCheck;
 
 
-  const colorIndex = props.isWhite ? 1 : 0;
+  const colorIndex = props.isWhite ? 0 : 1;
   if (props.imageUrl !== undefined) {
     return (
       <div className="piece-wrapper">
@@ -48,7 +54,7 @@ const ChessPiece = (props) => {
           className="piece"
           alt="chess piece"
           ref={(r) => {
-            dragRef(r);
+            canPieceBeMovedByThisPlayer && dragRef(r)
             pieceRef.current = r;
           }}
           style={{

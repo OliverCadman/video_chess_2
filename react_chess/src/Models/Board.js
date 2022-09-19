@@ -80,23 +80,71 @@ class ChessBoard {
     const y = pieceCoordinates[1];
 
     const fromSquareAlgebraNotation = currentBoard[y][x].notation;
-
+    const toSquareAlgebraNotation = this.playerIsWhite ? this.toChessMove([to[0], to[1]]) : currentBoard[to[0]][to[1]].notation;
     const pieceToMove = currentBoard[y][x].getPiece();
     const pawnPromoted = this.isPawnPromotion(pieceID, to);
 
     // Validate moves with chess.js
-    const moveAttempt = pawnPromoted
-      ? this.chess.move({
-          from: fromSquareAlgebraNotation,
-          to: this.toChessMove([to[0], to[1]]),
-          piece: pieceID[1],
-          promotion: "q",
-        })
-      : this.chess.move({
-          from: fromSquareAlgebraNotation,
-          to: this.toChessMove([to[0], to[1]]),
-          piece: pieceID[1],
-        });
+    let moveAttempt;
+
+    if (this.playerIsWhite) {
+      if (isMyMove) {
+        moveAttempt = pawnPromoted
+          ? this.chess.move({
+              from: fromSquareAlgebraNotation,
+              to: toSquareAlgebraNotation,
+              piece: pieceID[1],
+              promotion: "q",
+            })
+          : this.chess.move({
+              from: fromSquareAlgebraNotation,
+              to: toSquareAlgebraNotation,
+              piece: pieceID[1],
+            });
+      } else {
+        moveAttempt = pawnPromoted
+          ? this.chess.move({
+              from: fromSquareAlgebraNotation,
+              to: this.toChessMove([7 - to[0], 7 - to[1]]),
+              piece: pieceID[1],
+              promotion: "q",
+            })
+          : this.chess.move({
+              from: fromSquareAlgebraNotation,
+              to: this.toChessMove([7 - to[0], 7 - to[1]]),
+              piece: pieceID[1],
+            });
+      }
+    } else {
+      if (isMyMove) {
+        moveAttempt = pawnPromoted
+          ? this.chess.move({
+              from: fromSquareAlgebraNotation,
+              to: this.toChessMove([7 - to[0], 7 - to[1]]),
+              piece: pieceID[1],
+              promotion: "q",
+            })
+          : this.chess.move({
+              from: fromSquareAlgebraNotation,
+              to: this.toChessMove([7 - to[0], 7 - to[1]]),
+              piece: pieceID[1],
+            });
+      } else {
+        moveAttempt = pawnPromoted
+          ? this.chess.move({
+              from: fromSquareAlgebraNotation,
+              to: this.toChessMove([to[0], to[1]]),
+              piece: pieceID[1],
+              promotion: "q",
+            })
+          : this.chess.move({
+              from: fromSquareAlgebraNotation,
+              to: this.toChessMove([to[0],to[1]]),
+              piece: pieceID[1],
+            });
+      }
+    }
+  
 
     if (moveAttempt) {
       if (isMyMove) {
@@ -203,12 +251,18 @@ class ChessBoard {
       verbose: true,
     });
 
+    // console.group("AVAILABLE MOVES");
+    // console.log(moves);
+    // console.groupEnd();
+
     const availableMoves = [];
 
     for (let move of moves) {
+      const [x, y] = [this.alphabetToX[move.to[0]], this.rankToY[move.to[1]]];
+      const [blackX,  blackY] = this.convertBoardCoords([x, y]);
       availableMoves.push([
-        this.alphabetToX[move.to[0]],
-        this.rankToY[move.to[1]],
+        this.playerIsWhite ? x : blackX,
+        this.playerIsWhite ? y : blackY
       ]);
     }
 
@@ -320,7 +374,7 @@ class ChessBoard {
       for (let j = 0; j < verticalAxisSquares.length; j++) {
         const xAxisLetters = horizontalAxisSquares[j];
         const yAxisNumbers = verticalAxisSquares[i];
-
+        const [blackX, blackY] = this.convertBoardCoords([j, i])
         const normalizedCoordinates = [(j + 1) * 82 + 15, (i + 1) * 82 + 15];
         board[i].push(
           new Square(
@@ -376,16 +430,16 @@ class ChessBoard {
             new ChessPiece(
               backrank[j],
               false,
-              this.playerIsWhite ? blackBackRankId[j] : whiteBackRankId[j],
-              this.playerIsWhite ? "black" : "white"
+              this.playerIsWhite ? whiteBackRankId[j] : blackBackRankId[j],
+              this.playerIsWhite ? "white" : "black"
             )
           );
           board[i + 1][this.playerIsWhite ? j : 7 - j].setPiece(
             new ChessPiece(
               "pawn",
               false,
-              this.playerIsWhite ? "bp" + (j + 1) : "wp" + (j + 1),
-              this.playerIsWhite ? "black" : "white"
+              this.playerIsWhite ? "wp" + (j + 1) : "bp" + (j + 1),
+              this.playerIsWhite ? "white" : "black"
             )
           );
         } else {
@@ -394,16 +448,16 @@ class ChessBoard {
             new ChessPiece(
               "pawn",
               false,
-              this.playerIsWhite ? "wp" + (j + 1) : "bp" + (j + 1),
-              this.playerIsWhite ? "white" : "black"
+              this.playerIsWhite ? "bp" + (j + 1) : "wp" + (j + 1),
+              this.playerIsWhite ? "black" : "white"
             )
           );
           board[i][this.playerIsWhite ? j : 7 - j].setPiece(
             new ChessPiece(
               backrank[j],
               false,
-              this.playerIsWhite ? whiteBackRankId[j] : blackBackRankId[j],
-              this.playerIsWhite ? "white" : "black"
+              this.playerIsWhite ? blackBackRankId[j] : whiteBackRankId[j],
+              this.playerIsWhite ? "black" : "white"
             )
           );
         }

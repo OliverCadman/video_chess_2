@@ -126,6 +126,7 @@ const ChessGame = ({gameID}) => {
                       isWhite={
                         isPieceOnThisSquare && (square.getPiece().color === "white")
                       }
+                      isPlayerWhite={color.isCreator}
                       pieceID={
                         isPieceOnThisSquare && square.pieceOnThisSquare.id
                       }

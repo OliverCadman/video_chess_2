@@ -20,8 +20,10 @@ const Tile = (props) => {
     collect: (monitor) => {
       if (monitor.getItem()) {
         const item = monitor.getItem();
-        pieceOnThisSquare = item.pieceID[1];
-        notation = item.square.notation;
+        if (item) {
+          pieceOnThisSquare = item.pieceID && item.pieceID[1];
+          notation = item.square && item.square.notation;
+        }
       }
       return {
         canDrop: props.canMovePiece(
@@ -59,6 +61,7 @@ const Tile = (props) => {
         square={props.square}
         blackInCheck={props.blackInCheck}
         whiteInCheck={props.whiteInCheck}
+        isPlayerWhite={props.isPlayerWhite}
       />
     </div>
   );
