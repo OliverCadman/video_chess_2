@@ -13,9 +13,11 @@ const RoomWrapper = ({ games, joinRoom, handleOpponentUserName, error }) => {
               key={index}
               gameID={game.gameID}
               creator={game.creator}
+              opponent={game.players[1]}
               joinRoom={joinRoom}
               handleOpponentUserName={handleOpponentUserName}
               error={error}
+              playerArray={game.players}
             />
           );
         })}

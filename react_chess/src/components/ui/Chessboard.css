@@ -1,9 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Buhid&display=swap');
 
-.chessboard-wrapper {
-    display: grid;
-    place-items: center;
-    height: 100%;
+.chessboard-container {
+    display: flex;
+    justify-content: space-around;
+    padding: 2rem;
 }
 
 #chessboard {
@@ -13,9 +13,6 @@
     flex-wrap: wrap-reverse;
     position: relative;
     z-index: 3;
-    margin: 2rem;
-
-
 }
 
 .tile {
@@ -87,6 +84,16 @@
     animation-name: bounce;
     animation-duration: 0.3s;
     transform: translate(0, 0);
+}
+
+.button__call {
+    background-color: rgb(15, 101, 15);
+    border: 0;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: "Noto Sans Buhid", sans-serif;
+    font-size: 1.45rem;
+    color: #fafafa;
 }
 
 

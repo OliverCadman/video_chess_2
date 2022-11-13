@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import "./Chessboard.css";
 import ChessBoard from "../../Models/Board";
 import Tile from "./Tile";
+import Video from "../../connections/video";
 
 import { ColorContext } from "../../context/ColorContext";
 
@@ -122,9 +123,13 @@ const ChessGame = ({gameID}) => {
                           isPieceOnThisSquare && square.pieceOnThisSquare.name
                         ]
                       }
+                      pieceName={
+                        isPieceOnThisSquare && square.pieceOnThisSquare.name
+                      }
                       isPieceOnThisSquare={isPieceOnThisSquare}
                       isWhite={
-                        isPieceOnThisSquare && (square.getPiece().color === "white")
+                        isPieceOnThisSquare &&
+                        square.getPiece().color === "white"
                       }
                       isPlayerWhite={color.isCreator}
                       pieceID={
@@ -148,24 +153,58 @@ const ChessGame = ({gameID}) => {
 };
 
 const ChessBoardWrapper = () => {
+  const [userName, setUserName] = useState('');
   const [opponentUserName, setOpponentUserName] = useState('');
+  const [opponentSocketID, setOpponentSocketID] = useState('');
   const { gameid } = useParams();
 
 
   useEffect(() => {
-    socket.on('playerJoinedGame', data => {
-      setOpponentUserName(data.opponentUserName);
-    socket.on('disconnected', () => {
-      socket.emit('deleteGame', gameid)
+    socket.on("playerJoinedGame", (data) => {
+        setUserName(data.playerNames[0]);
+        setOpponentSocketID(data.socketID);
+    });
+
+    socket.on("startGame", (data) => {
+      console.log("starting game", data, socket.id)
+       if (data.socketID !== socket.id) {
+         setOpponentUserName(data.playerNames[1]);
+       }
     })
-    }, [socket])
+
+
+    socket.on("giveUsername", socketid => {
+      console.group("GIVING USERNAME:")
+      console.log("MY SOCKET ID:", socket.id, "OPPONENT SOCKET ID:", socketid)
+      console.groupEnd();
+      if (socket.id !== socketid) {
+        socket.emit("receivedUsername", {
+          userName,
+          gameid
+        })
+      }
+    })
+
+    socket.on("getOpponentUserName", (data) => {
+      if (socket.id !== data.socketId) {
+        setOpponentUserName(data.userName);
+      }
+    })
 
     return () => {
-      socket.off('playerJoinedGame');
-    }
-  })
+      socket.off("playerJoinedGame");
+    };
+  }, [socket, userName]);
   return (
-    <ChessGame gameID={gameid}/>
+    <div className="chessboard-container">
+      <ChessGame gameID={gameid}/>
+      <Video 
+      opponentSocketID={opponentSocketID}
+      mySocketID={socket.id}
+      opponentUserName={opponentUserName}
+
+      />
+    </div>
   )
 };
 

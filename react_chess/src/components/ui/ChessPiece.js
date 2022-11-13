@@ -52,7 +52,7 @@ const ChessPiece = (props) => {
         <img
           src={props.imageUrl[colorIndex]}
           className="piece"
-          alt="chess piece"
+          alt={props.pieceID}
           ref={(r) => {
             canPieceBeMovedByThisPlayer && dragRef(r)
             pieceRef.current = r;

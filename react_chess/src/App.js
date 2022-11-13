@@ -17,6 +17,11 @@ import ChessboardWrapper from './components/ui/Chessboard';
 
 function App() {
   const [isCreator, setIsCreator] = useState(false);
+  const [userName, setUserName] = useState("");
+
+  const handleCreatorUserName = (input) => {
+    setUserName(input);
+  }
 
   const playerIsCreator = useCallback(() => {
     setIsCreator(true);
@@ -34,8 +39,8 @@ function App() {
       <div className="app">
         <BrowserRouter>
           <Routes>
-            <Route path="/" exact element={<Lobby />}></Route>
-            <Route path="/game/:gameid" element={<ChessboardWrapper />} />
+            <Route path="/" exact element={<Lobby handleCreatorUserName={handleCreatorUserName}/>}></Route>
+            <Route path="/game/:gameid" element={<ChessboardWrapper userName={userName}/>} />
           </Routes>
         </BrowserRouter>
       </div>

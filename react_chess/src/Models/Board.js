@@ -1,3 +1,11 @@
+/**
+ * TODO: SOCKET IO RECEIVERS:
+ *             En Passant
+ *             Castling (only from opponent's perspective)
+ *             
+ *             
+ */
+
 import Square from "./Square";
 import ChessPiece from "./Piece";
 import { Chess } from "chess.js";
@@ -144,10 +152,14 @@ class ChessBoard {
             });
       }
     }
-  
 
-    if (moveAttempt) {
-      if (isMyMove) {
+    
+    
+    if (!moveAttempt) return;
+
+    console.log('MOVE ATTEMPT', moveAttempt);
+    
+    if (isMyMove) {
         currentBoard[to[1]][to[0]].setPiece(pieceToMove);
       } else {
         const [x, y] = this.convertBoardCoords(to);
@@ -155,21 +167,45 @@ class ChessBoard {
       }
 
       currentBoard[y][x].setPiece(null);
-
       this.setBoard(currentBoard);
-    } else if (moveAttempt === null) {
-      return;
-    } else if (moveAttempt.flags === "c") {
-      console.log("capture");
-    } else if (moveAttempt.flags === "p" || moveAttempt.flags === "cp") {
-      console.log("promotion");
-      const color = pieceID[0];
-      if (color === "w") {
-        console.log("promotion!");
-        currentBoard[to[1][0]].setPiece(
-          new ChessPiece("queen", false, "wq2", "white")
-        );
-      }
+
+    switch (moveAttempt.flags) {
+      case "e":
+        const move = moveAttempt.to;
+        const x = this.alphabetToX[move[0]];
+        console.log(x, this.convertBoardCoords)
+        let y;
+
+        if (moveAttempt.color === "w") {
+           y = parseInt(move[1], 10) - 2;
+         } else {
+           y = parseInt(move[1], 10) + 2;
+         }
+        
+        if (isMyMove) {
+           currentBoard[y][x].setPiece(null);
+        } else {
+          const [convertedX, convertedY] = this.convertBoardCoords([x, y]);
+          currentBoard[convertedY][convertedX].setPiece(null);
+        }
+        break;
+      case "p":
+        console.log("promotion");
+        setPromotion("w", currentBoard, to);
+        break;
+      case "cp":
+        console.log("Promotion with capture");
+        setPromotion("w", currentBoard, to);
+        break;
+      case "b":
+        console.log("Double pawn push");
+        break;
+      case "n":
+        console.log("Move without capture");
+      case "c":
+        console.log("Capture");
+      default:
+        break;
     }
 
     const check = this.chess.inCheck();
@@ -185,10 +221,30 @@ class ChessBoard {
     const playerDidCastle = this.didCastle(moveAttempt);
     if (playerDidCastle) {
       // If player castled, update position of rook.
-      const { fromX, toX, fromY, toY } = playerDidCastle;
-      let castlingRook = currentBoard[fromY][fromX].getPiece();
+      let castlingRook;
+      let { fromX, toX, fromY, toY } = playerDidCastle;
+      if (isMyMove) {
+        console.log('MY CASTLE ATTEMPT', playerDidCastle);
+        console.group('COORDS');
+        console.log('fromX', fromX)
+        console.log('fromY', fromY)
+        console.log('toX', toX)
+        console.log('toY', toY)
+        console.groupEnd();
+      castlingRook = currentBoard[fromY][fromX].getPiece();
       currentBoard[toY][toX].setPiece(castlingRook);
       currentBoard[fromY][fromX].setPiece(null);
+      } else {
+        const [convertedFromX, convertedFromY] = this.convertBoardCoords([fromX, fromY]);
+        const [convertedToX, convertedToY] = this.convertBoardCoords([toX, toY]);
+        console.log('OPPONENT CASTLE ATTEMPT', playerDidCastle);
+        console.log('CONVERTED FROM', this.convertBoardCoords([fromX, fromY]))
+        console.log('CONVERTED TO', this.convertBoardCoords([toX, toY]))
+         castlingRook = currentBoard[convertedFromY][convertedFromX].getPiece();
+         currentBoard[convertedToY][convertedToX].setPiece(castlingRook);
+         currentBoard[convertedFromY][convertedFromX].setPiece(null);
+      }
+     
     }
 
     //
@@ -206,6 +262,7 @@ class ChessBoard {
 
     if (threeFoldRepetition) return this.chess.turn() + threeFoldRepetition;
   }
+  
 
   toChessMove(finalPosition) {
     /*
@@ -467,5 +524,12 @@ class ChessBoard {
     return board;
   }
 }
+
+const setPromotion = (color, board, to) => {
+  if (color === "w") {
+    console.log("promotion!");
+    board[to[1][0]].setPiece(new ChessPiece("queen", false, "wq2", "white"));
+  }
+}; 
 
 export default ChessBoard;

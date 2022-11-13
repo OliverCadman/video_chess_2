@@ -62,6 +62,7 @@ const Tile = (props) => {
         blackInCheck={props.blackInCheck}
         whiteInCheck={props.whiteInCheck}
         isPlayerWhite={props.isPlayerWhite}
+        pieceName={props.pieceName}
       />
     </div>
   );
