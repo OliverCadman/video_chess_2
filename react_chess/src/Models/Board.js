@@ -218,7 +218,8 @@ class ChessBoard {
     // Determine castling
     //
 
-    const playerDidCastle = this.didCastle(moveAttempt);
+    const playerDidCastle = this.didCastle(moveAttempt, true);
+    console.log('Player castled?:', playerDidCastle);
     if (playerDidCastle) {
       // If player castled, update position of rook.
       let castlingRook;
@@ -361,7 +362,7 @@ class ChessBoard {
     }
   }
 
-  didCastle(moveAttempt) {
+  didCastle(moveAttempt, isMyMove) {
     /**
      * Check for castling attempt.
      * If castle, return position and destination
@@ -392,22 +393,43 @@ class ChessBoard {
         };
       } else if (from === "e8" && to === "c8") {
         // Black queenside castle
-        return {
-          didCastle: true,
-          fromX: 0,
-          toX: 3,
-          fromY: 7,
-          toY: 7,
-        };
+        if (isMyMove) {
+          return {
+            didCastle: true,
+            fromX: 7,
+            toX: 4,
+            fromY: 0,
+            toY: 0,
+          };
+        } else {
+          return {
+            didCastle: true,
+            fromX: 0,
+            toX: 3,
+            fromY: 7,
+            toY: 7
+          }
+        }
       } else if (from === "e8" && to === "g8") {
-        // Black kingside castle
-        return {
-          didCastle: true,
-          fromX: 7,
-          toX: 5,
-          fromY: 7,
-          toY: 7,
-        };
+
+        if (isMyMove) {
+          // Black kingside castle
+          return {
+            didCastle: true,
+            fromX: 0,
+            toX: 2,
+            fromY: 0,
+            toY: 0,
+          };
+        } else {
+          return {
+            didCastle: true,
+            fromX: 7,
+            toX: 5,
+            fromY: 7,
+            toY: 7
+          }
+        }
       } else {
         return false;
       }
