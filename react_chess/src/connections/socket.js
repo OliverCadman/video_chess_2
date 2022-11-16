@@ -1,6 +1,6 @@
 import io from "socket.io-client";
 
-const URL = "http://localhost:3000/";
+const URL = "https://chess-backend-2022.herokuapp.com/";
 
 const socket = io(URL);
 

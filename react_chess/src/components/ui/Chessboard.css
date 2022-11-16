@@ -1,5 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Buhid&display=swap');
 
+p {
+    font-family: 'Noto Sans Buhid', sans-serif;
+    color: #fafafa;
+}
+
 .chessboard-container {
     display: flex;
     justify-content: space-around;
@@ -94,6 +99,37 @@
     font-family: "Noto Sans Buhid", sans-serif;
     font-size: 1.45rem;
     color: #fafafa;
+}
+
+#video-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30%;
+    position: relative;
+}
+
+
+#video-wrapper {
+    background-color: #191919;
+    width: 100%;
+    height: 60%;
+    position: relative;
+}
+
+.video {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin-top: 1rem;
+    margin-left: 1rem;
+}
+
+video {
+    width: 40%;
 }
 
 

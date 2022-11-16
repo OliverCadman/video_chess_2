@@ -15,8 +15,11 @@ const Video = (props) => {
     const [receiverVideo, setReceiverVideo] = useState(null)
     const [caller, setCaller] = useState("");
 
+
     const senderRef = useRef();
     const receiverRef = useRef();
+
+    console.log('PROPS', props)
 
     useEffect(() => {
         navigator.mediaDevices.getUserMedia({video: true, audio: true}).then((stream) => {
@@ -35,24 +38,29 @@ const Video = (props) => {
     }, [senderRef, receiverRef]);
 
     const initializePeer = (receiverID) => {
+        console.log('RECEIVER ID', receiverID);
         setIsCalling(true);
         const peer = new Peer({
-            stream: true,
-            trickle: false,
-            initiator: true
+            stream: stream,
+            initiator: true,
+            trickle: false
         })
 
         peer.on("signal", data => {
+            console.log('SIGNAL EVENT:', data, 'RECEIVER ID:', receiverID)
+
             socket.emit("callUser", {userToCall: receiverID, signalData: data, from: props.mySocketID})
         })
 
         peer.on("stream", stream => {
+            console.log('STREAM EVENT:', stream)
             if (receiverRef.current) {
                 receiverRef.current.srcObject = stream;
             }
         })
 
         socket.on("callAccepted", signal => {
+            console.log('CALL ACCEPTED EVENT:', signal)
             setCallAccepted(true);
             peer.signal(signal);
         })
@@ -65,21 +73,26 @@ const Video = (props) => {
         const peer = new Peer({
             initiator: false,
             trickle: false,
-            stream: true
+            stream: stream
         })
 
         peer.on("signal", data => {
+            console.log('SIGNAL EVENT ON CALL ACCEPTED:', data)
             socket.emit("acceptCall", {signal: data, to: caller})
         })
 
         peer.on("stream", stream => {
-            receiverVideo.current.srcObject = stream;
+            console.log('STREAM EVENT ON CALL ACCEPTED:', stream)
+            receiverRef.current.srcObject = stream;
         })
 
         peer.signal(callerSignal);
     }
 
     let userVideo;
+    let mainView;
+
+
     if (stream) {
         if (callAccepted) {
             userVideo = (
@@ -89,7 +102,6 @@ const Video = (props) => {
                     playsInline
                     autoPlay
                     muted
-                    style={{width: "100%"}}
                     />
                 </>
             );
@@ -100,20 +112,16 @@ const Video = (props) => {
                 playsInline
                 autoPlay
                 muted
-                style={{width: "100%"}}
                 />
                 <video 
                 ref={receiverRef}
                 playsInline
                 autoPlay
                 muted
-                style={{width: "100%"}}
                 />
             </>
         }
     }
-
-    let mainView;
 
     if (callAccepted) {
         mainView = (
@@ -123,7 +131,6 @@ const Video = (props) => {
                 playsInline
                 muted
                 autoPlay
-                style={{width: "100%"}}
                 />
             </>
         )
@@ -147,31 +154,36 @@ const Video = (props) => {
             </div>
         )
     } else {
-        mainView = (
-            <>
-                <button onClick={() => initializePeer(props.opponentSocketID)} className="button__call">
-                    Call {props.opponentUserName}
+
+        if (!props.opponentSocketID) {
+          mainView = <p>Waiting for other player...</p>;
+        } else {
+            mainView = (
+              <>
+                <button
+                  onClick={() => initializePeer(props.opponentSocketID)}
+                  className="button__call"
+                >
+                  Call {props.opponentUserName}
                 </button>
-            </>
-        )
+              </>
+            );
+        }
     }
 
   return (
-    <div
-      style={{
-        height: "100%",
-        padding: "0 .5rem",
-      }}
-    >
-      {userVideo}
+    <div id="video-container">
       <div
         style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
+          padding: "2rem",
         }}
+        id="video-wrapper"
       >
-        {mainView}
+        {userVideo}
+        <div className="video"
+        >
+          {mainView}
+        </div>
       </div>
     </div>
   );

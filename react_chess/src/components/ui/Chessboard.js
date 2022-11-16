@@ -158,18 +158,33 @@ const ChessBoardWrapper = () => {
   const [opponentSocketID, setOpponentSocketID] = useState('');
   const { gameid } = useParams();
 
+  const color = useContext(ColorContext);
+
 
   useEffect(() => {
     socket.on("playerJoinedGame", (data) => {
         setUserName(data.playerNames[0]);
-        setOpponentSocketID(data.socketID);
     });
 
     socket.on("startGame", (data) => {
       console.log("starting game", data, socket.id)
-       if (data.socketID !== socket.id) {
+       if (color.isCreator) {
          setOpponentUserName(data.playerNames[1]);
+       } else {
+         setOpponentUserName(data.playerNames[0])
        }
+
+       for (let id of data.socketIDArray) {
+          if (socket.id !== id) {
+            setOpponentSocketID(id);
+            console.log('MY SOCKET ID:', socket.id);
+            console.log("MY OPPONENT'S SOCKET ID:", id);
+          }
+       }
+    })
+
+    socket.on("opponentJoinedGame", (data) => {
+      console.log('OPPONENT JOINED GAME', data);
     })
 
 
@@ -197,15 +212,14 @@ const ChessBoardWrapper = () => {
   }, [socket, userName]);
   return (
     <div className="chessboard-container">
-      <ChessGame gameID={gameid}/>
-      <Video 
-      opponentSocketID={opponentSocketID}
-      mySocketID={socket.id}
-      opponentUserName={opponentUserName}
-
-      />
-    </div>
-  )
+      <ChessGame gameID={gameid} />
+        <Video
+          opponentSocketID={opponentSocketID}
+          mySocketID={socket.id}
+          opponentUserName={opponentUserName}
+        />
+      </div>
+  );
 };
 
 

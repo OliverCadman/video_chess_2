@@ -153,11 +153,9 @@ class ChessBoard {
       }
     }
 
-    
+    console.log(moveAttempt);
     
     if (!moveAttempt) return;
-
-    console.log('MOVE ATTEMPT', moveAttempt);
     
     if (isMyMove) {
         currentBoard[to[1]][to[0]].setPiece(pieceToMove);
@@ -173,7 +171,6 @@ class ChessBoard {
       case "e":
         const move = moveAttempt.to;
         const x = this.alphabetToX[move[0]];
-        console.log(x, this.convertBoardCoords)
         let y;
 
         if (moveAttempt.color === "w") {
@@ -191,19 +188,17 @@ class ChessBoard {
         break;
       case "p":
         console.log("promotion");
-        setPromotion("w", currentBoard, to);
+        this.setPromotion(moveAttempt.color, currentBoard, to, isMyMove);
         break;
       case "cp":
         console.log("Promotion with capture");
-        setPromotion("w", currentBoard, to);
+        this.setPromotion(moveAttempt.color, currentBoard, to, isMyMove);
         break;
       case "b":
-        console.log("Double pawn push");
         break;
       case "n":
-        console.log("Move without capture");
+        break
       case "c":
-        console.log("Capture");
       default:
         break;
     }
@@ -219,35 +214,23 @@ class ChessBoard {
     //
 
     const playerDidCastle = this.didCastle(moveAttempt, true);
-    console.log('Player castled?:', playerDidCastle);
     if (playerDidCastle) {
       // If player castled, update position of rook.
       let castlingRook;
       let { fromX, toX, fromY, toY } = playerDidCastle;
       if (isMyMove) {
-        console.log('MY CASTLE ATTEMPT', playerDidCastle);
-        console.group('COORDS');
-        console.log('fromX', fromX)
-        console.log('fromY', fromY)
-        console.log('toX', toX)
-        console.log('toY', toY)
-        console.groupEnd();
       castlingRook = currentBoard[fromY][fromX].getPiece();
       currentBoard[toY][toX].setPiece(castlingRook);
       currentBoard[fromY][fromX].setPiece(null);
       } else {
         const [convertedFromX, convertedFromY] = this.convertBoardCoords([fromX, fromY]);
         const [convertedToX, convertedToY] = this.convertBoardCoords([toX, toY]);
-        console.log('OPPONENT CASTLE ATTEMPT', playerDidCastle);
-        console.log('CONVERTED FROM', this.convertBoardCoords([fromX, fromY]))
-        console.log('CONVERTED TO', this.convertBoardCoords([toX, toY]))
          castlingRook = currentBoard[convertedFromY][convertedFromX].getPiece();
          currentBoard[convertedToY][convertedToX].setPiece(castlingRook);
          currentBoard[convertedFromY][convertedFromX].setPiece(null);
       }
      
     }
-
     //
     // Determine circumstances when game is over.
     //
@@ -286,20 +269,6 @@ class ChessBoard {
         }
       }
     }
-
-    // const squareOnRow = currentBoard.map((row) => {
-    //   return row.reduce((array, square) => {
-    //     if (square.getPieceIDOnSquare() === pieceID) {
-    //       array.push(square);
-    //     }
-
-    //     return array;
-    //   }, [])
-    // })
-
-    // const specificSquare = squareOnRow.filter(square => square.length !== 0);
-
-    // return [specificSquare[0][0].x, specificSquare[0][0].y]
   }
 
   canMovePiece(piece, squareThisPieceIsOn, x, y) {
@@ -308,10 +277,6 @@ class ChessBoard {
       square: squareThisPieceIsOn,
       verbose: true,
     });
-
-    // console.group("AVAILABLE MOVES");
-    // console.log(moves);
-    // console.groupEnd();
 
     const availableMoves = [];
 
@@ -359,6 +324,42 @@ class ChessBoard {
       return true;
     } else {
       return false;
+    }
+  }
+
+  setPromotion(color, board, to, isMyMove) {
+    const [convertedX, convertedY] = this.convertBoardCoords(to);
+    if (color === "w") {
+      console.log('COLOR THAT JUST MOVED IS WHITE')
+      if (isMyMove) {
+        console.log('IT IS MY (WHITES) MOVE');
+
+        console.log(board[to[1]][to[0]])
+        board[to[1]][to[0]].setPiece(
+          new ChessPiece("queen", false, "wq2", "white")
+        );
+      } else {
+        console.log('I AM LOOKING AT WHITE MOVING NOW')
+        console.log(board[convertedY][convertedX])
+        board[convertedY][convertedX].setPiece(
+          new ChessPiece("queen", false, 'wq2', "white")
+        );
+      }
+    } else {
+      console.log("COLOR THAT JUST MOVED IS BLACK")
+      if (isMyMove) {
+        console.log("IT IS MY (BLACK'S) MOVE")
+        console.log(board[to[1]][to[0]]);
+        board[to[1]][to[0]].setPiece(
+          new ChessPiece("queen", false, "bq2", "black")
+        );
+      } else {
+        console.log('I AM LOOKING AT BLACK MOVING NOW')
+        console.log(board[convertedY][convertedX]);
+        board[convertedY][convertedX].setPiece(
+          new ChessPiece("queen", false, "bq2", "black")
+        );
+      }
     }
   }
 
@@ -547,11 +548,5 @@ class ChessBoard {
   }
 }
 
-const setPromotion = (color, board, to) => {
-  if (color === "w") {
-    console.log("promotion!");
-    board[to[1][0]].setPiece(new ChessPiece("queen", false, "wq2", "white"));
-  }
-}; 
 
 export default ChessBoard;
