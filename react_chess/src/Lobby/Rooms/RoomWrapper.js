@@ -1,6 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { socket } from "../../connections/socket";
-
+import React from 'react';
 import Room from "./Room";
 
 const RoomWrapper = ({ games, joinRoom, handleOpponentUserName, error }) => {

@@ -102,6 +102,7 @@ const Video = (props) => {
                     playsInline
                     autoPlay
                     muted
+                    controls
                     />
                 </>
             );
@@ -111,13 +112,13 @@ const Video = (props) => {
                 ref={senderRef}
                 playsInline
                 autoPlay
-                muted
+                controls
                 />
                 <video 
                 ref={receiverRef}
                 playsInline
                 autoPlay
-                muted
+                controls
                 />
             </>
         }
@@ -129,7 +130,7 @@ const Video = (props) => {
                 <video 
                 ref={receiverRef}
                 playsInline
-                muted
+                controls
                 autoPlay
                 />
             </>
